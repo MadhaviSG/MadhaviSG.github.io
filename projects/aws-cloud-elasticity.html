@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Cloud Elasticity Project - Case Study | Madhavi Gulavani</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #8b5cf6;
+            --accent-color: #06b6d4;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-card: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-primary);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .nav-back {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .nav-back:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .section h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section h3 {
+            color: var(--text-primary);
+            margin: 1.5rem 0 1rem 0;
+            font-size: 1.3rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .metric-card {
+            text-align: center;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .tech-category {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tech-category h4 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tech-list {
+            list-style: none;
+        }
+
+        .tech-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tech-list li:last-child {
+            border-bottom: none;
+        }
+
+        .achievement-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .challenge-solution {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .challenge, .solution {
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .challenge {
+            background: #fee2e2;
+            border-left-color: #ef4444;
+        }
+
+        .solution {
+            background: #d1fae5;
+            border-left-color: #10b981;
+        }
+
+        .architecture-diagram {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            margin: 2rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .diagram-placeholder {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 3rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+        }
+
+        .code-snippet {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 600;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 1rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--primary-color);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-left: 1rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -1.5rem;
+            top: 1.5rem;
+            width: 12px;
+            height: 12px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            border: 3px solid white;
+        }
+
+        @media (max-width: 768px) {
+            .challenge-solution {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-back {
+                position: static;
+                margin-bottom: 2rem;
+                align-self: flex-start;
+            }
+            
+            .header {
+                padding: 2rem 1rem;
+                position: relative;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="index.html" class="nav-back">
+            <i class="fas fa-arrow-left"></i>
+            Back to Portfolio
+        </a>
+        <h1>AWS Cloud Elasticity & Auto-Scaling System</h1>
+        <p>Enterprise-grade infrastructure for dynamic load management with intelligent cost optimization</p>
+    </div>
+
+    <div class="container">
+        <!-- Project Overview -->
+        <div class="section">
+            <h2><i class="fas fa-info-circle"></i> Project Overview</h2>
+            <p>
+                Designed and implemented a comprehensive cloud elasticity solution on AWS to handle dynamic traffic loads 
+                while optimizing for both performance and cost efficiency. The system successfully managed traffic spikes 
+                from near-zero to 2000+ requests per second using intelligent auto-scaling policies.
+            </p>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">35+</div>
+                    <div class="metric-label">Peak RPS Achieved</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">99.5%</div>
+                    <div class="metric-label">System Uptime</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">170</div>
+                    <div class="metric-label">Instance-Hours Budget</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">50x</div>
+                    <div class="metric-label">Traffic Spike Handling</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">&lt;200ms</div>
+                    <div class="metric-label">Avg Response Time</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">85%</div>
+                    <div class="metric-label">Budget Efficiency</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technical Architecture -->
+        <div class="section">
+            <h2><i class="fas fa-sitemap"></i> Technical Architecture</h2>
+            
+            <div class="architecture-diagram">
+                <div class="diagram-placeholder">
+                    <p><strong>Multi-Tier Auto-Scaling Architecture</strong></p>
+                    <p>Load Balancer → Auto Scaling Group → CloudWatch Monitoring → Intelligent Scaling Policies</p>
+                </div>
+            </div>
+
+            <div class="tech-grid">
+                <div class="tech-category">
+                    <h4><i class="fas fa-cloud"></i> AWS Services</h4>
+                    <ul class="tech-list">
+                        <li>EC2 Auto Scaling Groups <span class="achievement-badge">Core</span></li>
+                        <li>Application Load Balancer <span class="achievement-badge">HA</span></li>
+                        <li>CloudWatch Metrics & Alarms <span class="achievement-badge">Monitoring</span></li>
+                        <li>EC2 m5.large Instances <span class="achievement-badge">Compute</span></li>
+                    </ul>
+                </div>
+                
+                <div class="tech-category">
+                    <h4><i class="fas fa-code"></i> Development</h4>
+                    <ul class="tech-list">
+                        <li>Java/Python AWS SDK <span class="achievement-badge">API</span></li>
+                        <li>Terraform IaC <span class="achievement-badge">Automation</span></li>
+                        <li>Shell Scripting <span class="achievement-badge">DevOps</span></li>
+                        <li>JSON Configuration <span class="achievement-badge">Config</span></li>
+                    </ul>
+                </div>
+                
+                <div class="tech-category">
+                    <h4><i class="fas fa-chart-line"></i> Monitoring</h4>
+                    <ul class="tech-list">
+                        <li>Real-time Metrics <span class="achievement-badge">Live</span></li>
+                        <li>Custom Dashboards <span class="achievement-badge">Viz</span></li>
+                        <li>Automated Alerting <span class="achievement-badge">Proactive</span></li>
+                        <li>Performance Analytics <span class="achievement-badge">Insights</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Challenges & Solutions -->
+        <div class="section">
+            <h2><i class="fas fa-lightbulb"></i> Key Challenges & Solutions</h2>
+            
+            <h3>Challenge 1: Balancing Performance vs. Cost</h3>
+            <div class="challenge-solution">
+                <div class="challenge">
+                    <h4>🎯 Challenge</h4>
+                    <p>Handle unpredictable traffic spikes (0-2000+ RPS) while staying within a strict $25-30 budget constraint. Traditional over-provisioning would exceed budget limits.</p>
+                </div>
+                <div class="solution">
+                    <h4>✅ Solution</h4>
+                    <p>Implemented <span class="highlight">multi-metric scaling triggers</span> (CPU, request count, response time) with step scaling for rapid response. Achieved 85% budget efficiency while exceeding performance targets.</p>
+                </div>
+            </div>
+
+            <h3>Challenge 2: Instance Warmup & Response Time</h3>
+            <div class="challenge-solution">
+                <div class="challenge">
+                    <h4>🎯 Challenge</h4>
+                    <p>New EC2 instances took 2-3 minutes to become ready, causing temporary performance degradation during traffic spikes.</p>
+                </div>
+                <div class="solution">
+                    <h4>✅ Solution</h4>
+                    <p>Optimized health checks, implemented <span class="highlight">intelligent cooldown periods</span> (180s scale-out, 120s scale-in), and used predictive scaling based on traffic pattern analysis.</p>
+                </div>
+            </div>
+
+            <h3>Challenge 3: System Fault Tolerance</h3>
+            <div class="challenge-solution">
+                <div class="challenge">
+                    <h4>🎯 Challenge</h4>
+                    <p>Ensure system resilience during simulated instance failures without service interruption or significant performance impact.</p>
+                </div>
+                <div class="solution">
+                    <h4>✅ Solution</h4>
+                    <p>Implemented <span class="highlight">automated failure detection</span> with ELB health checks, graceful instance draining, and rapid replacement policies. Achieved 99.5%+ uptime.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Auto-Scaling Policy Design -->
+        <div class="section">
+            <h2><i class="fas fa-cogs"></i> Intelligent Auto-Scaling Policy Design</h2>
+            
+            <h3>Traffic Pattern Analysis</h3>
+            <p>
+                Analyzed bursty, unpredictable traffic patterns resembling real-world scenarios (stock market trading hours). 
+                Identified optimal scaling thresholds through extensive testing and CloudWatch metrics analysis.
+            </p>
+
+            <div class="code-snippet">
+Scale-Out Triggers:
+• CPU Utilization > 80% (5-min average)
+• Request Count > threshold per instance  
+• Response Time > 500ms average
+• Error Rate > 5%
+
+Scale-In Triggers:
+• CPU Utilization < 20% (5-min average)
+• Sustained low traffic (10+ minutes)
+• All health checks passing
+
+Cooldown Strategy:
+• Scale-out: 180 seconds (conservative growth)
+• Scale-in: 120 seconds (faster cost reduction)
+            </div>
+
+            <h3>Multi-Metric Scaling Approach</h3>
+            <p>
+                Unlike traditional single-metric scaling, implemented a <span class="highlight">hybrid approach</span> combining:
+            </p>
+            <ul style="margin: 1rem 0; padding-left: 2rem;">
+                <li><strong>Primary:</strong> CPU utilization for baseline scaling decisions</li>
+                <li><strong>Secondary:</strong> Request count for traffic surge detection</li>
+                <li><strong>Tertiary:</strong> Response time for performance degradation prevention</li>
+                <li><strong>Safety:</strong> Error rate monitoring for failure detection</li>
+            </ul>
+        </div>
+
+        <!-- Implementation Timeline -->
+        <div class="section">
+            <h2><i class="fas fa-timeline"></i> Implementation Journey</h2>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h4>Phase 1: Manual Horizontal Scaling</h4>
+                    <p>Built foundational infrastructure with programmatic EC2 management, security groups, and load balancer configuration. Achieved target RPS within 30-minute constraints.</p>
+                </div>
+                
+                <div class="timeline-item">
+                    <h4>Phase 2: Traffic Pattern Analysis</h4>
+                    <p>Conducted extensive analysis of variable traffic patterns, identified optimal scaling thresholds, and designed intelligent cooldown strategies to prevent oscillation.</p>
+                </div>
+                
+                <div class="timeline-item">
+                    <h4>Phase 3: Auto-Scaling Implementation</h4>
+                    <p>Developed sophisticated scaling policies with CloudWatch integration, step scaling for aggressive scale-out, and conservative scale-in for cost optimization.</p>
+                </div>
+                
+                <div class="timeline-item">
+                    <h4>Phase 4: Infrastructure as Code</h4>
+                    <p>Translated entire architecture to Terraform for reproducible deployments, version control, and consistent environment management across development stages.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Learnings -->
+        <div class="section">
+            <h2><i class="fas fa-graduation-cap"></i> Key Learnings & Impact</h2>
+            
+            <h3>Technical Insights</h3>
+            <ul style="margin: 1rem 0; padding-left: 2rem; line-height: 1.8;">
+                <li><strong>Cooldown Optimization:</strong> Longer cooldowns (180s) significantly improved system stability and reduced unnecessary scaling actions</li>
+                <li><strong>Multi-Metric Benefits:</strong> Combining CPU, request count, and response time metrics provided more accurate scaling decisions than single-metric approaches</li>
+                <li><strong>Cost vs Performance:</strong> Achieved optimal balance by using step scaling for rapid scale-out but conservative scale-in policies</li>
+                <li><strong>Health Check Tuning:</strong> Optimized health check intervals and thresholds critical for preventing false negatives under load</li>
+            </ul>
+
+            <h3>Business Value</h3>
+            <ul style="margin: 1rem 0; padding-left: 2rem; line-height: 1.8;">
+                <li><strong>Cost Efficiency:</strong> Demonstrated 85% budget utilization while exceeding all performance targets</li>
+                <li><strong>Scalability:</strong> System capable of handling 50x traffic spikes automatically without manual intervention</li>
+                <li><strong>Reliability:</strong> 99.5%+ uptime with automated failure recovery and zero-downtime deployments</li>
+                <li><strong>Maintainability:</strong> Infrastructure as Code approach enables consistent, version-controlled deployments</li>
+            </ul>
+
+            <h3>Skills Demonstrated</h3>
+            <div class="tech-grid">
+                <div class="tech-category">
+                    <h4><i class="fas fa-cloud"></i> Cloud Architecture</h4>
+                    <ul class="tech-list">
+                        <li>Auto-scaling design patterns</li>
+                        <li>Load balancer optimization</li>
+                        <li>Multi-AZ fault tolerance</li>
+                        <li>Cost optimization strategies</li>
+                    </ul>
+                </div>
+                
+                <div class="tech-category">
+                    <h4><i class="fas fa-code"></i> DevOps Engineering</h4>
+                    <ul class="tech-list">
+                        <li>Infrastructure as Code (Terraform)</li>
+                        <li>Automated monitoring & alerting</li>
+                        <li>Performance optimization</li>
+                        <li>Incident response automation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="section" style="text-align: center; background: var(--bg-secondary);">
+            <h2><i class="fas fa-rocket"></i> Ready to Build Scalable Systems?</h2>
+            <p style="margin-bottom: 2rem; font-size: 1.1rem;">
+                This project demonstrates my ability to design and implement enterprise-grade cloud infrastructure 
+                that balances performance, cost, and reliability. Let's discuss how I can bring these skills to your team!
+            </p>
+            <a href="index.html#contact" style="display: inline-block; background: var(--primary-color); color: white; padding: 1rem 2rem; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s ease;">
+                <i class="fas fa-envelope"></i> Get In Touch
+            </a>
+        </div>
+    </div>
+</body>
+</html>
