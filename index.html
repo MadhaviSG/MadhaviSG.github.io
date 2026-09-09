@@ -143,8 +143,15 @@
   .contact .email:hover .em-parts i{color:var(--accent)}
   .contact .socials{display:flex;gap:22px;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--ink-2);flex-wrap:wrap}
   footer{padding:24px 0 48px;font-family:var(--mono);font-size:11px;color:var(--ink-3);border-top:1px solid var(--line)}
-  footer .inner{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  footer .inner{display:flex;justify-content:space-between;align-items:center;gap:10px 24px;flex-wrap:wrap}
+  footer .right{display:flex;align-items:center;gap:8px 20px;flex-wrap:wrap;justify-content:flex-end}
   footer .np{display:flex;align-items:center;gap:8px}
+  footer .hits{display:flex;align-items:center;gap:7px;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+  footer .hits[hidden]{display:none}
+  footer .hits .pulse{width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 0 var(--accent);animation:hitpulse 2.4s ease-out infinite}
+  footer .hits b{color:var(--ink-2);font-weight:500}
+  footer .hits .mine{color:var(--ink-3);opacity:.75}
+  @keyframes hitpulse{0%{box-shadow:0 0 0 0 color-mix(in oklab,var(--accent) 55%,transparent)}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
   footer .np .bars{display:inline-flex;gap:2px;align-items:end;height:12px}
   footer .np .bars i{width:2px;background:var(--accent);display:inline-block;animation:bars 1.2s ease-in-out infinite}
   footer .np .bars i:nth-child(1){height:40%;animation-delay:0s}
@@ -169,7 +176,7 @@
   html[data-voice="loud"] .proj h3{font-size:34px}
   html[data-voice="loud"] .proj .stats .v{font-size:29px}
   html[data-voice="loud"] .sec-head h2{font-size:clamp(42px,5.6vw,70px)}
-  html[data-motion="still"] .brand .blip,html[data-motion="still"] .name .wave,html[data-motion="still"] footer .np .bars i{animation:none}
+  html[data-motion="still"] .brand .blip,html[data-motion="still"] .name .wave,html[data-motion="still"] footer .np .bars i,html[data-motion="still"] footer .hits .pulse{animation:none}
   html[data-motion="still"] .reveal{opacity:1;transform:none;transition:none}
   html[data-motion="restless"] .brand .blip{animation-duration:1.1s}
   html[data-motion="restless"] .name .wave{animation-duration:1.3s}
@@ -229,7 +236,7 @@
         <div class="eyebrow"><span class="line-em"></span> ML / AI ENGINEER · MS ECE, CARNEGIE MELLON '26</div>
         <h1 class="name">Hi, I'm <em>Madhavi</em><span class="wave">👋</span></h1>
         <p class="lede">
-          I love to explore, build and hsip software that solves problems — six years of production
+          I build <span class="hl">ML systems that actually run</span> — six years of production
           <span class="tag">Java / Spring Boot</span> fintech behind me, now working on
           <span class="tag">agent safety</span> and <span class="tag">LLM evaluation</span> at the CMU
           Language Technologies Institute.
@@ -321,7 +328,7 @@
     <div class="sec-head">
       <span class="num">/ 02</span>
       <h2>Selected <em>work</em>.</h2>
-      <span class="sub">13 projects · filter to narrow</span>
+      <span class="sub">16 projects · filter to narrow</span>
     </div>
     <div class="filters" id="filters"></div>
     <div class="projects" id="projects"></div>
@@ -459,14 +466,44 @@
 <footer>
   <div class="wrap inner">
     <div>© 2026 Madhavi Gulavani · hand-built · no frameworks were harmed</div>
-    <div class="np">
-      <span class="bars"><i></i><i></i><i></i><i></i></span>
-      <span id="nowPlaying">now training: safety critic · LoRA SFT on 1,250 trajectories</span>
+    <div class="right">
+      <div class="np">
+        <span class="bars"><i></i><i></i><i></i><i></i></span>
+        <span id="nowPlaying">now training: safety critic · LoRA SFT on 1,250 trajectories</span>
+      </div>
+      <div class="hits" id="hits" hidden title="visits to this page"><span class="pulse"></span><span>visits <b id="hitsTotal">—</b></span><span class="mine" id="hitsMine"></span></div>
     </div>
   </div>
 </footer>
 
 <script>
+  /* visit counter: global tally via counterapi (one bump per browser session),
+     plus a private local tally so the number is always meaningful to me */
+  (function(){
+    var box=document.getElementById('hits'),total=document.getElementById('hitsTotal'),mine=document.getElementById('hitsMine');
+    if(!box)return;
+    var fmt=function(n){return Number(n).toLocaleString('en-US')};
+    /* ?me=1 once marks this browser as mine — my own visit tally then stays visible to me only */
+    var owner=false;
+    try{
+      if(/[?&]me=1/.test(location.search))localStorage.setItem('mg_owner','1');
+      owner=localStorage.getItem('mg_owner')==='1';
+    }catch(e){}
+    var m=1;try{m=(parseInt(localStorage.getItem('mg_visits')||'0',10)||0)+1;localStorage.setItem('mg_visits',String(m));}catch(e){}
+    if(owner)mine.textContent='· mine '+fmt(m);
+    var fresh=true;try{fresh=!sessionStorage.getItem('mg_counted');if(fresh)sessionStorage.setItem('mg_counted','1');}catch(e){}
+    var root='https://abacus.jasoncameron.dev/',key='madhavisg-github-io/index';
+    var ask=function(verb){return fetch(root+verb+'/'+key,{cache:'no-store'}).then(function(r){
+      if(!r.ok)throw 0;return r.json();
+    }).then(function(d){if(!d||typeof d.value!=='number')throw 0;return d.value})};
+    /* read path 404s until the key exists — fall through to hit so the first ever load still registers */
+    ask(fresh?'hit':'get').catch(function(){return ask('hit')}).then(function(v){
+      total.textContent=fmt(v);box.hidden=false;
+    }).catch(function(){
+      if(!owner)return; /* counter unreachable: stay silent for visitors */
+      total.textContent=fmt(m);mine.textContent='· local tally';box.title='global counter unreachable';box.hidden=false;
+    });
+  })();
   /* email is stored rot13+reversed+base64 so it never appears in source, and is
      only assembled after a real user gesture — scrapers and headless fetchers get nothing */
   (function(){
@@ -598,6 +635,33 @@
       thumb:"attn"
     },
     {
+      title:"Image-Conditioned Music Generation",
+      role:"CMU 18-789 · generative models",
+      tags:["multimodal","finetuning"],
+      desc:"An image-to-music pipeline built on MusicGen, comparing full finetuning (~300M trainable parameters) against LoRA adaptation (6.3M, r=16) with explicit conditioning tokens; full finetuning pulled distributional alignment on the target subset from 0.79 to 0.60 JSD against a frontier-model baseline. Paired image, caption and audio data was curated from scratch and scored with CLAP embedding cosine similarity. The interesting result was negative: near-silent generations were inflating the embedding metric, so reported scores overstated quality — text-to-music vs image-to-music ablations traced the degradation to CLIP image embeddings landing outside the text encoder's latent space.",
+      stats:[["Full FT","~300M params"],["LoRA","6.3M · r=16"],["JSD","0.79 → 0.60"]],
+      links:[],
+      thumb:"music"
+    },
+    {
+      title:"Generative Models from Scratch",
+      role:"CMU 18-789 · PyTorch, NumPy, W&B",
+      tags:["diffusion","GANs","from scratch"],
+      desc:"A variance-preserving SDE diffusion model written end to end — forward Euler–Maruyama simulation, learned score, reverse-SDE sampling — with training cut from ~3 hours to ~2 minutes per epoch by sampling the closed-form marginal instead of simulating the forward process, alongside a derivation of the equivalence between denoising score matching, flow matching and the optimal denoiser. Also VAE, vanilla GAN, DCGAN and WGAN-GP with gradient penalty, stabilized through architecture changes and a β sweep: the convolutional generator beat the MLP one with 7× fewer parameters (80,928 vs 581,264). A 6-layer encoder-decoder Transformer and NumPy BPTT round it out at BLEU 25.10 on Multi30K German-English.",
+      stats:[["Epoch time","3h → 2min"],["Conv vs MLP","7× fewer params"],["BLEU","25.10"]],
+      links:[],
+      thumb:"denoise"
+    },
+    {
+      title:"Face Verification with ArcFace",
+      role:"metric learning · multi-GPU PyTorch",
+      tags:["metric learning","vision"],
+      desc:"A ResNet-34 trained without BatchNorm, held stable by Kaiming initialization, linear warmup with cosine annealing and gradient clipping, reaching 92.30% verification accuracy at 9.23% EER. Training runs cross-entropy with label smoothing first, then ArcFace angular-margin finetuning; open-set verification is evaluated by cosine similarity over penultimate embeddings.",
+      stats:[["Accuracy","92.30%"],["EER","9.23%"],["Backbone","ResNet-34 · no BN"]],
+      links:[],
+      thumb:"arcface"
+    },
+    {
       title:"Real-Time Driver Matching",
       role:"coursework · CMU",
       tags:["distributed systems","streaming"],
@@ -714,6 +778,38 @@
         s+=`<text x="120" y="${y+3}" class="ph-text">${i+1}</text>`;});
       return base+s+`<text x="16" y="24" class="ph-text">call · text · call</text><text x="16" y="148" class="ph-text">mock mode, no keys</text></svg>`;
     }
+    if(kind==="music"){
+      let s=`<rect x="16" y="40" width="52" height="52" rx="6" class="ph-line" fill="none"/>`;
+      s+=`<path d="M22 84 L38 62 L48 74 L58 56 L62 84 Z" fill="var(--accent)" opacity="0.5"/><circle cx="33" cy="54" r="5" class="ph-fill" opacity="0.8"/>`;
+      s+=`<line x1="70" y1="66" x2="88" y2="66" stroke="var(--accent)" stroke-width="1.5"/><path d="M84 62 L90 66 L84 70 Z" fill="var(--accent)"/>`;
+      for(let i=0;i<9;i++){const h=8+Math.abs(Math.sin(i*0.8)*34);s+=`<rect x="${96+i*6}" y="${66-h/2}" width="3" height="${h.toFixed(1)}" rx="1.5" fill="var(--accent)" opacity="${(0.35+h/70).toFixed(2)}"/>`;}
+      return base+s+`<text x="16" y="28" class="ph-text">image → audio</text><text x="16" y="122" class="ph-text">JSD 0.79 → 0.60</text><text x="16" y="140" class="ph-text">CLAP cosine · LoRA r=16</text></svg>`;
+    }
+    if(kind==="denoise"){
+      let s="";
+      for(let i=0;i<140;i++){
+        const t=i/139,x=14+Math.random()*132,y=24+Math.random()*100;
+        const cx=80+(x-80)*(0.25+0.75*(1-t)),cy=88+(y-88)*(0.25+0.75*(1-t));
+        s+=`<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="1.6" fill="var(--accent)" opacity="${(0.15+0.6*(1-t)).toFixed(2)}"/>`;
+      }
+      s+=`<line x1="14" y1="136" x2="146" y2="136" class="ph-line" stroke-width="1"/>`;
+      s+=`<text x="14" y="150" class="ph-text">t = 1</text><text x="146" y="150" class="ph-text" text-anchor="end">t = 0</text>`;
+      return base+s+`<text x="14" y="20" class="ph-text">reverse SDE</text></svg>`;
+    }
+    if(kind==="arcface"){
+      let s=`<circle cx="80" cy="84" r="52" class="ph-line" fill="none"/><circle cx="80" cy="84" r="3" class="ph-fill"/>`;
+      const centers=[-0.5,1.4,2.9];
+      centers.forEach((a,ci)=>{
+        s+=`<line x1="80" y1="84" x2="${(80+Math.cos(a)*52).toFixed(1)}" y2="${(84+Math.sin(a)*52).toFixed(1)}" stroke="var(--accent)" stroke-width="1" opacity="0.5" stroke-dasharray="3 3"/>`;
+        for(let k=0;k<7;k++){
+          const d=a+(k-3)*0.055,r=26+((k*37)%22);
+          s+=`<circle cx="${(80+Math.cos(d)*r).toFixed(1)}" cy="${(84+Math.sin(d)*r).toFixed(1)}" r="3" fill="${ci===1?'var(--accent)':'var(--ink-3)'}" opacity="${ci===1?0.95:0.5}"/>`;
+        }
+      });
+      const a0=-0.5,a1=1.4;
+      s+=`<path d="M ${(80+Math.cos(a0)*16).toFixed(1)} ${(84+Math.sin(a0)*16).toFixed(1)} A 16 16 0 0 1 ${(80+Math.cos(a1)*16).toFixed(1)} ${(84+Math.sin(a1)*16).toFixed(1)}" fill="none" stroke="var(--accent)" stroke-width="1.5"/>`;
+      return base+s+`<text x="80" y="152" class="ph-text" text-anchor="middle">angular margin · EER 9.23%</text></svg>`;
+    }
     if(kind==="spec"){
       let bars="";for(let i=0;i<60;i++){const h=10+Math.abs(Math.sin(i*0.3)*50)+Math.abs(Math.cos(i*0.11)*28);bars+=`<rect x="${10+i*2.4}" y="${130-h}" width="1.6" height="${h.toFixed(1)}" fill="var(--accent)" opacity="${(0.3+h/160).toFixed(2)}"/>`;}
       return base+bars+`<text x="10" y="20" class="ph-text">&lt;90ms to first audio</text></svg>`;
@@ -732,11 +828,25 @@
     "FreshMart voice agent":["Agentic AI","Voice"],
     "Voice Travel Companion":["Agentic AI","Voice","Hackathon"],
     "Deep learning systems series":["Deep learning"],
+    "Image-Conditioned Music Generation":["Generative models","Deep learning","Research"],
+    "Generative Models from Scratch":["Generative models","Deep learning","Systems"],
+    "Face Verification with ArcFace":["Deep learning"],
     "Real-Time Driver Matching":["Distributed systems","Systems"],
     "Multi-Cloud Chat Service":["Distributed systems","Systems"],
     "Social Media Platform":["Distributed systems","Systems"]
   };
-  const FILTER_ORDER=["Agentic AI","AI safety","Deep learning","Distributed systems","Voice","RL","Systems","Research","Hackathon"];
+  const FILTER_ORDER=["Agentic AI","AI safety","Deep learning","Generative models","Distributed systems","Voice","RL","Systems","Research","Hackathon"];
+
+  const ORDER=[
+    /* deep learning & research */
+    "Generative Models from Scratch","Image-Conditioned Music Generation","MyTorch + Transformer ASR",
+    "Face Verification with ArcFace","EEG multimodal retrieval","Deep learning systems series","OpenAgentSafety",
+    /* systems & software engineering */
+    "Scotty Scheduler v2","Real-Time Driver Matching","Multi-Cloud Chat Service","Social Media Platform","FreshMart voice agent",
+    /* exploratory · hackathons & sprints */
+    "Voice Travel Companion","Warden","Asking Is Not Acting","NegotiateEnv"
+  ];
+  projects.sort((a,b)=>ORDER.indexOf(a.title)-ORDER.indexOf(b.title));
 
   const projWrap=document.getElementById('projects');
   projects.forEach(p=>{
@@ -889,7 +999,7 @@
     const TWEAKS = /*EDITMODE-BEGIN*/{
       "voice": "editorial",
       "motion": "alive",
-      "accent": "coral"
+      "accent": "violet"
     }/*EDITMODE-END*/;
 
     const ACCENTS = {coral:'oklch(0.66 0.17 32)',cobalt:'oklch(0.60 0.15 258)',moss:'oklch(0.58 0.12 150)',violet:'oklch(0.62 0.17 305)'};
