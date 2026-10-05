@@ -544,6 +544,15 @@
 
   const projects=[
     {
+      title:"Trident",
+      role:"solo · 2026",
+      tags:["multi-agent","fintech","real OFAC data"],
+      desc:"Three specialist risk agents for fintech onboarding, fanned out in parallel and joined by a policy engine that applies hard rules before any weighted score. KYC screens names against a real OFAC SDN snapshot (29,447 indexed strings covering both name orders and aliases) in 0.5 ms per case using letter-and-token blocking; fraud scores the newest transaction against account history with a gradient boosted model, an isolation forest and velocity/geo rules; credit pairs a calibrated PD model with a logistic reason-code model for adverse-action explanations. Every step lands in an append-only audit log, agents fail closed to review on error or timeout, and an ablation shows what each agent catches alone.",
+      stats:[["Decision agreement","98.6%"],["False approves","0 / 216"],["p50 latency","13 ms"]],
+      links:[["GitHub","https://github.com/MadhaviSG/trident"]],
+      thumb:"fanout"
+    },
+    {
       title:"Scotty Scheduler v2",
       role:"hackathon · 2026",
       tags:["hackathon","multi-agent","deterministic verifier"],
@@ -709,6 +718,19 @@
       labels.forEach((l,i)=>{s+=`<text x="80" y="${ys[i]+3}" class="ph-text" text-anchor="middle">${l}</text>`;});
       return base+s+`</svg>`;
     }
+    if(kind==="fanout"){
+      let s=`<rect x="56" y="14" width="48" height="20" rx="5" class="ph-line" fill="none"/><text x="80" y="28" class="ph-text" text-anchor="middle">case</text>`;
+      const xs=[28,80,132],labels=["kyc","fraud","credit"],fills=[0.35,0.95,0.2];
+      xs.forEach((x,i)=>{
+        s+=`<line x1="80" y1="34" x2="${x}" y2="62" stroke="var(--accent)" stroke-width="1.5"/>`;
+        s+=`<rect x="${x-22}" y="62" width="44" height="22" rx="5" class="ph-line" fill="none"/><text x="${x}" y="77" class="ph-text" text-anchor="middle">${labels[i]}</text>`;
+        s+=`<rect x="${x-18}" y="90" width="36" height="4" fill="var(--line-2)"/><rect x="${x-18}" y="90" width="${(36*fills[i]).toFixed(1)}" height="4" fill="var(--accent)"/>`;
+        s+=`<line x1="${x}" y1="96" x2="80" y2="118" stroke="var(--accent)" stroke-width="1.5"/>`;
+      });
+      s+=`<rect x="44" y="118" width="72" height="22" rx="5" fill="var(--accent)" opacity="0.9"/><text x="80" y="133" class="ph-text" text-anchor="middle" style="fill:var(--bg);font-weight:600">REVIEW</text>`;
+      s+=`<text x="80" y="154" class="ph-text" text-anchor="middle">audit: 8 events · 13 ms</text>`;
+      return base+s+`</svg>`;
+    }
     if(kind==="gauge"){
       let s=`<circle cx="80" cy="88" r="46" class="ph-line" fill="none"/>`;
       for(let i=0;i<=40;i++){const a=Math.PI*(1+i/40);const x1=80+Math.cos(a)*38,y1=88+Math.sin(a)*38,x2=80+Math.cos(a)*46,y2=88+Math.sin(a)*46;
@@ -834,6 +856,7 @@
   }
 
   const CATS={
+    "Trident":["Agentic AI","Systems"],
     "Scotty Scheduler v2":["Agentic AI","Systems","Hackathon"],
     "Warden":["Agentic AI","AI safety","Hackathon"],
     "Asking Is Not Acting":["AI safety","Research"],
@@ -859,7 +882,7 @@
     "kv-cache-lab","Generative Models from Scratch","Image-Conditioned Music Generation","MyTorch + Transformer ASR",
     "Face Verification with ArcFace","EEG multimodal retrieval","Deep learning systems series","OpenAgentSafety",
     /* systems & software engineering */
-    "Scotty Scheduler v2","Real-Time Driver Matching","Multi-Cloud Chat Service","Social Media Platform","FreshMart voice agent",
+    "Trident","Scotty Scheduler v2","Real-Time Driver Matching","Multi-Cloud Chat Service","Social Media Platform","FreshMart voice agent",
     /* exploratory · hackathons & sprints */
     "Voice Travel Companion","Warden","Asking Is Not Acting","NegotiateEnv"
   ];
