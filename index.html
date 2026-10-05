@@ -328,7 +328,7 @@
     <div class="sec-head">
       <span class="num">/ 02</span>
       <h2>Selected <em>work</em>.</h2>
-      <span class="sub">16 projects · filter to narrow</span>
+      <span class="sub">17 projects · filter to narrow</span>
     </div>
     <div class="filters" id="filters"></div>
     <div class="projects" id="projects"></div>
@@ -572,6 +572,15 @@
       thumb:"rank"
     },
     {
+      title:"kv-cache-lab",
+      role:"solo · 2026",
+      tags:["PyTorch","from scratch","inference"],
+      desc:"Three KV cache strategies for transformer decoding, from scratch in pure PyTorch behind one three-method interface: naive concat, static preallocation, and a PagedAttention-style allocator with fixed-size blocks, per-sequence block tables, reference counting and copy-on-write forking. Every strategy matches a full uncached recompute to 1e-5; they differ only in memory policy, which is exactly what the benchmarks measure. Paged keeps 98.8% of reserved KV memory live on a ragged batch where static keeps 43.2%, and shares a prompt across 8 parallel samples for 78% less memory.",
+      stats:[["Decode speedup","9.8x"],["Paged KV utilization","98.8%"],["Equivalence tests","20"]],
+      links:[["GitHub","https://github.com/MadhaviSG/kv-cache-lab"]],
+      thumb:"blocks"
+    },
+    {
       title:"MyTorch + Transformer ASR",
       role:"solo · 2025",
       tags:["NumPy","from scratch","speech"],
@@ -714,6 +723,13 @@
         s+=`<text x="${55+i*50}" y="150" class="ph-text" text-anchor="middle">${lbl[i]}</text>`;});
       return base+s+`<line x1="14" y1="136" x2="146" y2="136" class="ph-line" stroke-width="1"/><text x="14" y="20" class="ph-text">6.00 / 7 vs 0 exits</text></svg>`;
     }
+    if(kind==="blocks"){
+      let s="";const owners=[1,1,1,2,2,0,3,3,1,2,0,0,3,0,0,0];
+      for(let i=0;i<16;i++){const x=12+(i%4)*35,y=14+Math.floor(i/4)*29;const o=owners[i];
+        s+=`<rect x="${x}" y="${y}" width="31" height="25" rx="3" class="ph-line" fill="${o===0?'none':'var(--accent)'}" opacity="${o===0?1:(o===1?0.9:(o===2?0.55:0.3))}"/>`;
+        for(let k=1;k<4;k++)s+=`<line x1="${x+k*7.75}" y1="${y}" x2="${x+k*7.75}" y2="${y+25}" stroke="var(--bg)" stroke-width="1" opacity="0.6"/>`;}
+      return base+s+`<text x="146" y="150" class="ph-text" text-anchor="end">98.8% live</text></svg>`;
+    }
     if(kind==="curve"){
       let pts="";for(let i=0;i<=20;i++){const x=14+i*6.6;const y=126-92*Math.exp(-i/5.5)+(i%3-1)*2.2;pts+=`${x.toFixed(1)},${y.toFixed(1)} `;}
       return base+`<polyline points="${pts}" fill="none" class="ph-accent" stroke-width="2"/><line x1="14" y1="136" x2="150" y2="136" class="ph-line" stroke-width="1"/><line x1="14" y1="20" x2="14" y2="136" class="ph-line" stroke-width="1"/><text x="146" y="30" class="ph-text" text-anchor="end">CER 8.78%</text></svg>`;
@@ -821,6 +837,7 @@
     "Scotty Scheduler v2":["Agentic AI","Systems","Hackathon"],
     "Warden":["Agentic AI","AI safety","Hackathon"],
     "Asking Is Not Acting":["AI safety","Research"],
+    "kv-cache-lab":["Deep learning","Systems"],
     "MyTorch + Transformer ASR":["Deep learning","Systems"],
     "OpenAgentSafety":["Agentic AI","AI safety","Research"],
     "EEG multimodal retrieval":["Deep learning","Research"],
@@ -839,7 +856,7 @@
 
   const ORDER=[
     /* deep learning & research */
-    "Generative Models from Scratch","Image-Conditioned Music Generation","MyTorch + Transformer ASR",
+    "kv-cache-lab","Generative Models from Scratch","Image-Conditioned Music Generation","MyTorch + Transformer ASR",
     "Face Verification with ArcFace","EEG multimodal retrieval","Deep learning systems series","OpenAgentSafety",
     /* systems & software engineering */
     "Scotty Scheduler v2","Real-Time Driver Matching","Multi-Cloud Chat Service","Social Media Platform","FreshMart voice agent",
